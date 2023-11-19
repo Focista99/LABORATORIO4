@@ -1,0 +1,147 @@
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+
+using namespace std;
+
+// Estructura para almacenar la información de un producto
+struct Producto {
+    string nombre;
+    int cantidad;
+    double precio;
+    double valorProducto;
+};
+
+// Procedimiento para ingresar la información de los productos
+void ingresarProductos(Producto productos[], int& numProductos);
+
+// Función para calcular el valor por cada producto
+double calcularValorProducto(int cantidad, double precio);
+
+// Función para calcular el valor total de la compra
+double calcularSubTotal(Producto productos[], int numProductos);
+
+// Función para calcular el valor del IVA
+double calcularIVA(double subTotal);
+
+// Función para determinar las unidades de productos comprados en total
+int calcularCantidadProductos(Producto productos[], int numProductos);
+
+// Función para calcular el valor total de la compra
+double calcularTotal(double subTotal, double iva);
+
+// Imprimir la lista de productos y la información de la factura
+void imprimirFactura(Producto productos[], int numProductos, double subTotal, double iva, int cantidadProductos, double total);
+
+// Función para guardar la factura en un archivo txt
+void guardarFactura(Producto productos[], int numProductos, double subTotal, double iva, int cantidadProductos, double total);
+
+void ingresarProductos(Producto productos[], int& numProductos) {
+    cout << "Ingrese el numero de productos a facturar: ";
+    cin >> numProductos;
+
+    for (int i = 0; i < numProductos; ++i) {
+        cout << "Ingrese los datos del producto " << i + 1 << ":\n";
+        cout << "Nombre del producto: ";
+        cin >> productos[i].nombre;
+        cout << "Cantidad del producto: ";
+        cin >> productos[i].cantidad;
+        cout << "Precio del producto: ";
+        cin >> productos[i].precio;
+
+        // Calcular el valor por cada producto
+        productos[i].valorProducto = calcularValorProducto(productos[i].cantidad, productos[i].precio);
+    }
+
+    double subTotal = calcularSubTotal(productos, numProductos);
+    double iva = calcularIVA(subTotal);
+    int cantidadProductos = calcularCantidadProductos(productos, numProductos);
+    double total = calcularTotal(subTotal, iva);
+
+    imprimirFactura(productos, numProductos, subTotal, iva, cantidadProductos, total);
+    guardarFactura(productos, numProductos, subTotal, iva, cantidadProductos, total);
+}
+
+double calcularValorProducto(int cantidad, double precio) {
+    return cantidad * precio;
+}
+
+double calcularSubTotal(Producto productos[], int numProductos) {
+    double subTotal = 0;
+
+    for (int i = 0; i < numProductos; ++i) {
+        subTotal += productos[i].valorProducto;
+    }
+
+    return subTotal;
+}
+
+double calcularIVA(double subTotal) {
+    return subTotal * 0.21;
+}
+
+int calcularCantidadProductos(Producto productos[], int numProductos) {
+    int cantidadProductos = 0;
+
+    for (int i = 0; i < numProductos; ++i) {
+        cantidadProductos += productos[i].cantidad;
+    }
+
+    return cantidadProductos;
+}
+
+double calcularTotal(double subTotal, double iva) {
+    return subTotal + iva;
+}
+
+void imprimirFactura(Producto productos[], int numProductos, double subTotal, double iva, int cantidadProductos, double total) {
+    cout << "\n\nLista de productos:\n";
+    cout << "nombreProducto  | cantidad | precioProducto  | valorProducto\n";
+
+    for (int i = 0; i < numProductos; ++i) {
+        cout << setw(9) << productos[i].nombre << " | " << setw(8) << productos[i].cantidad << " | "
+            << setw(8) << fixed << setprecision(2) << productos[i].precio << " | " << setw(14)
+            << fixed << setprecision(2) << productos[i].valorProducto << endl;
+    }
+
+    cout << "\nSubTotal: " << fixed << setprecision(2) << subTotal << endl;
+    cout << "IVA: " << fixed << setprecision(2) << iva << endl;
+    cout << "Cantidad de productos: " << cantidadProductos << endl;
+    cout << "Total: " << fixed << setprecision(2) << total << endl;
+}
+
+void guardarFactura(Producto productos[], int numProductos, double subTotal, double iva, int cantidadProductos, double total) {
+    ofstream archivo("facturaFinal.txt");
+
+    if (archivo.is_open()) {
+        archivo << "Lista de productos:\n";
+        archivo << "nombreProducto | cantidad | precioProducto | valorProducto\n";
+
+        for (int i = 0; i < numProductos; ++i) {
+            archivo << setw(9) << productos[i].nombre << " | " << setw(8) << productos[i].cantidad << " | "
+                << setw(8) << fixed << setprecision(2) << productos[i].precio << " | " << setw(14)
+                << fixed << setprecision(2) << productos[i].valorProducto << endl;
+        }
+
+        archivo << "\nSubTotal: " << fixed << setprecision(2) << subTotal << endl;
+        archivo << "IVA : " << fixed << setprecision(2) << iva << endl;
+        archivo << "Cantidad de productos: " << cantidadProductos << endl;
+        archivo << "Total: " << fixed << setprecision(2) << total << endl;
+
+        cout << "La factura se ha guardado en el archivo facturaFinal.txt.\n";
+
+        archivo.close();
+    }
+    else {
+        cout << "Error al abrir el archivo para guardar la facturaFinal.\n";
+    }
+}
+
+int main() {
+    Producto productos[73];
+    int numProductos = 0;
+
+    ingresarProductos(productos, numProductos);
+
+    return 0;
+}
